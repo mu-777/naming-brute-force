@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Kanji Combinations</title>
+</head>
+
+<body>
+  <h2>Select a Kanji and Enter a Number:</h2>
+
+  <!-- コンボボックスから漢字を選択 -->
+  <!-- <select id="kanjiSelect">
+    <option value="" disabled selected>Select a Kanji</option>
+  </select> -->
+  <input type="text" list="kanjiList" id="kanjiInput">
+
+  <!-- 数値を入力 -->
+  <input type="number" id="numberInput" min="1" placeholder="Enter a Number">
+
+  <button onclick="generateCombinations()">Generate Combinations</button>
+
+  <h3>Combinations:</h3>
+
+  <!-- 結果を表示する領域 -->
+  <ul id="combinationsList">
+  </ul>
+
+  <script>
+    let kanjiData;
+    // JSONデータを読み込み
+    loadJSON(function (response) {
+      kanjiData = JSON.parse(response);
+      // populateKanjiSelect();
+    });
+
+    // JSONデータをファイルから読み込む関数
+    function loadJSON(callback) {
+      const xhr = new XMLHttpRequest();
+      xhr.overrideMimeType("application/json");
+      xhr.open("GET", "./kanji_list_white.json", true); // ファイルのパスを指定
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          callback(xhr.responseText);
+        }
+      };
+      xhr.send(null);
+    }
+
+    // コンボボックスに漢字を追加
+    function populateKanjiSelect() {
+      const kanjiSelect = document.getElementById("kanjiSelect");
+      let cnt = 1;
+      for (const key in kanjiData) {
+        kanjiData[key].forEach((kanji, idx) => {
+          const option = document.createElement("option");
+          option.value = cnt;
+          option.dataset.character = kanji.character;
+          option.dataset.link = kanji.link;
+          option.dataset.kakusuu = key;
+          option.textContent = `${kanji.character} (${key}画)`;
+          kanjiSelect.appendChild(option);
+          cnt++;
+        });
+      }
+    }
+
+
+    function getSelectedKanji() {
+      // const selectedOptionIndex = document.getElementById("kanjiSelect").value;
+      // const selectedOption = document.getElementById("kanjiSelect")[selectedOptionIndex];
+      // const selectedKanji = selectedOption.dataset.character; // 選択された漢字
+      // const selectedKakusuu = selectedOption.dataset.kakusuu; // 選択されたキー
+      // const selectedKanjiLink = selectedOption.dataset.link; // 選択されたリンク
+      // return {
+      //   kanji: selectedKanji,
+      //   kakusuu: selectedKakusuu,
+      //   kanjiLink: selectedKanjiLink,
+      // }
+
+      const selectedKanji = document.getElementById("kanjiInput").value; // 選択された漢字
+      const ret = (() => {
+        for (const key in kanjiData) {
+          const charactersInKey = kanjiData[key];
+          const foundCharacter = charactersInKey.find(entry => entry.character === selectedKanji);
+          if (foundCharacter) {
+            return {
+              kakusuu: key,
+              link: foundCharacter.link
+            }
+          }
+        }
+        return null;
+      })()
+      return {
+        kanji: selectedKanji,
+        kakusuu: ret.kakusuu,
+        kanjiLink: ret.link,
+      }
+    }
+
+    // 漢字の組み合わせを生成する関数
+    function generateCombinations() {
+      const selected = getSelectedKanji();
+      const totalKakusuu = parseInt(document.getElementById("numberInput").value);
+      console.log(`generateCombinations: ${selected.kanji}, ${selected.kakusuu}, ${totalKakusuu}, ${selected.kanjiLink}`)
+
+      const combinationsList = document.getElementById("combinationsList");
+      combinationsList.innerHTML = "";
+
+      if (!selected.kanji || isNaN(totalKakusuu)) {
+        return;
+      }
+      const targetKakusuu = totalKakusuu - selected.kakusuu
+      if (targetKakusuu <= 0) {
+        combinationsList.innerHTML = `<h3> Target(${totalKakusuu}) is too small </h3>`
+        return;
+      }
+      console.log(kanjiData[targetKakusuu])
+      kanjiData[targetKakusuu].forEach((kanji1, index1) => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `<p><font size="5">${kanji1.character}${selected.kanji}</font> &emsp; (
+                                <a href="${kanji1.link}" target="_blank">${kanji1.character}</a> 
+                                , <a href="${selected.kanjiLink}" target="_blank">${selected.kanji}</a>
+                              )</p>`;
+        combinationsList.appendChild(listItem);
+
+        const listItem2 = document.createElement("li");
+        listItem2.innerHTML = `<p><font size="5">${selected.kanji}${kanji1.character}</font> &emsp; (
+                                <a href="${selected.kanjiLink}" target="_blank">${selected.kanji}</a>
+                                , <a href="${kanji1.link}" target="_blank">${kanji1.character}</a> 
+                              )</p>`;
+        combinationsList.appendChild(listItem2);
+
+      });
+
+      // const listItem = document.createElement("li");
+      // listItem.innerHTML = `<p>====================================</p>`;
+      // combinationsList.appendChild(listItem);
+
+      // kanjiData[targetKakusuu].forEach((kanji1, index1) => {
+      //   const listItem = document.createElement("li");
+      //   listItem.innerHTML = `<p><font size="5">${selected.kanji}${kanji1.character}</font> &emsp; (
+      //                           <a href="${selected.kanjiLink}" target="_blank">${selected.kanji}</a>
+      //                           , <a href="${kanji1.link}" target="_blank">${kanji1.character}</a> 
+      //                         )</p>`;
+      //   combinationsList.appendChild(listItem);
+      // });
+    }
+
+  </script>
+</body>
+
+</html>
