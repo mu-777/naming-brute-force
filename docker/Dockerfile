@@ -6,6 +6,10 @@ RUN apt update && apt install -y --no-install-recommends \
 
 RUN pip3 install requests beautifulsoup4
 
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash \
+    && nvm install 22 \
+    && corepack enable pnpm
+
 RUN echo ALL ALL=\(ALL:ALL\) NOPASSWD: ALL>> /etc/sudoers
 
 COPY ./entrypoint.sh /
