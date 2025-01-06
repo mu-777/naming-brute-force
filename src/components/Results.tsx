@@ -1,43 +1,90 @@
-import Box from '@mui/joy/Box';
-import Typography from '@mui/joy/Typography';
-import ResultCard from "./ResultCard";
+import { useRef, useEffect, useState } from 'react';
+import { useAtomValue } from 'jotai';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { resultsAtom } from '@/store/atoms';
 import { useFavorites } from '@/hooks/useFavorites';
-import { Result } from '@/types/Result';
+import ResultCard from './ResultCard';
+import Typography from '@mui/joy/Typography';
+import Box from '@mui/joy/Box';
 
-type GroupedResults = Record<number, Result[]>;
+const ITEMS_PER_PAGE = 50;
 
-type ResultsProps = {
-  results: GroupedResults;
-  onRemove: (strokeGroup: number, index: number) => void;
-};
+function Results() {
+  const results = useAtomValue(resultsAtom);
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_PAGE);
+  const parentRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
 
+  const rowVirtualizer = useVirtualizer({
+    count: Math.min(displayedCount, results.length),
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 300,
+    overscan: 5,
+  });
 
-function Results({ results, onRemove }: ResultsProps) {
-  const { favorites, addFavorite, removeFavorite } = useFavorites();
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && displayedCount < results.length) {
+          setDisplayedCount(prev => Math.min(prev + ITEMS_PER_PAGE, results.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-  return (Object.keys(results).length === 0) ? (
-    <Typography>条件を入力して検索してください。</Typography>
-  ) : (
-    <>
-      {Object.keys(results).map((strokeGroup) => (
-        <Box key={strokeGroup} mb={4}>
-          <Typography fontSize="lg" fontWeight="bold" mb={2}>
-            合計画数: {strokeGroup}
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [displayedCount, results.length]);
+
+  if (results.length === 0) {
+    return <Typography>条件を入力して検索してください。</Typography>;
+  }
+
+  return (
+    <Box ref={parentRef} sx={{ height: '100%', overflow: 'auto' }}>
+      <div
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+          const result = results[virtualRow.index];
+          return (
+            <div
+              key={virtualRow.index}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: virtualRow.size,
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              <ResultCard
+                result={result}
+                onAddFavorite={addFavorite}
+                onRemoveFavorite={removeFavorite}
+                isFavorite={isFavorite(result.name)}
+              />
+            </div>
+          );
+        })}
+      </div>
+      {displayedCount < results.length && (
+        <div ref={loadingRef} style={{ height: '20px', margin: '10px 0' }}>
+          <Typography level="body-sm" textAlign="center">
+            読み込み中...
           </Typography>
-          {results[parseInt(strokeGroup)].map((result, index) => (
-            <ResultCard
-              key={index}
-              strokeGroup={parseInt(strokeGroup)}
-              result={result}
-              onRemove={() => onRemove(parseInt(strokeGroup), index)}
-              onAddFavorite={addFavorite}
-              onRemoveFavorite={removeFavorite}
-              isFavorite={favorites.some(fav => fav.name === result.name)}
-            />
-          ))}
-        </Box>
-      ))}
-    </>
+        </div>
+      )}
+    </Box>
   );
 }
 

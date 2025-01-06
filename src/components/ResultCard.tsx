@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Typography from '@mui/joy/Typography';
 import Button from '@mui/joy/Button';
 import Stack from '@mui/joy/Stack';
@@ -8,15 +9,17 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { Result } from '@/types/Result';
 
 type ResultCardProps = {
-  strokeGroup: number;
   result: Result;
-  onRemove: (strokeGroup: number, index: number) => void;
+  onRemove?: (strokeGroup: number, index: number) => void;
   onAddFavorite: (result: Result) => void;
   onRemoveFavorite: (name: string) => void;
   isFavorite: boolean;
 };
 
-function ResultCard({ strokeGroup, result, onRemove, onAddFavorite, onRemoveFavorite, isFavorite }: ResultCardProps) {
+function ResultCardBase({
+  result, onRemove, onAddFavorite, onRemoveFavorite, isFavorite
+}: ResultCardProps) {
+
   return (
     <Card
       variant="outlined"
@@ -53,15 +56,16 @@ function ResultCard({ strokeGroup, result, onRemove, onAddFavorite, onRemoveFavo
           >
             {isFavorite ? "お気に入りから削除" : "お気に入りに追加"}
           </Button>
-
-          <Button
-            variant="soft"
-            color="danger"
-            onClick={() => onRemove(strokeGroup, 0)}
-            size="sm"
-          >
-            削除
-          </Button>
+          {
+            !onRemove ? null : <Button
+              variant="soft"
+              color="danger"
+              onClick={() => console.log('remove')}
+              size="sm"
+            >
+              削除
+            </Button>
+          }
         </Stack>
 
         <Stack
@@ -81,7 +85,7 @@ function ResultCard({ strokeGroup, result, onRemove, onAddFavorite, onRemoveFavo
               }}
             >
               <Typography level="h4">{char}</Typography>
-              <Typography level="body-sm">画数: {/* 各文字の画数 */}</Typography>
+              <Typography level="body-sm">画数: xxx</Typography>
             </Card>
           ))}
         </Stack>
@@ -89,5 +93,10 @@ function ResultCard({ strokeGroup, result, onRemove, onAddFavorite, onRemoveFavo
     </Card>
   );
 }
+
+const ResultCard = memo(ResultCardBase, (prevProps, nextProps) => {
+  return prevProps.result.name === nextProps.result.name &&
+    prevProps.isFavorite === nextProps.isFavorite;
+});
 
 export default ResultCard;

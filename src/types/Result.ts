@@ -4,3 +4,28 @@ export type Result = {
 };
 
 export type GroupedResults = Record<number, Result[]>;
+
+export enum SearchMode {
+  START_WITH = 'START_WITH',
+  END_WITH = 'END_WITH',
+  CONTAIN = 'CONTAIN'
+}
+
+export enum CharCount {
+  TWO = 2,
+  THREE = 3
+}
+
+export type SearchParams = {
+  kanjiInput: string[];
+  searchMode: SearchMode;
+  charCount: CharCount;
+  strokeCount: number;
+};
+
+
+export type KanjiData = {
+  character: string;
+  stroke: number;
+  linkpath: string;
+};

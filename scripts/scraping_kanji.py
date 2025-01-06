@@ -1,30 +1,56 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import argparse
+import os
 
-url = 'https://kanji.jitenon.jp/cat/namae.html'
-response = requests.get(url)
+DOMAIN = 'https://kanji.jitenon.jp'
+URL = f'{DOMAIN}/cat/namae.html'
 
-soup = BeautifulSoup(response.text, 'html.parser')
+print(URL)
 
-# parts01からparts29までのdivを取得
-divs = soup.find_all('div', {'class': 'parts_box'})
-data = {}
+def scrape_kanji(output_path):
+  response = requests.get(URL)
 
-for i in range(1, 30):
-  div_id = f'parts{i:02d}'  # id属性の値を生成 (parts01, parts02, ..., parts29)
-  div = soup.find('div', {'class': 'parts_box', 'id': div_id})
+  soup = BeautifulSoup(response.text, 'html.parser')
+  kanji_list = []
 
-  if div:
-    character_data = []
-    ul = div.find('ul', {'class': 'search_parts'})
-    lis = ul.find_all('li')
-    for li in lis:
-      a = li.find('a')
-      character = a.text
-      link = a['href']
-      character_data.append({'character': character, 'link': link})
-    data[str(i)] = character_data
+  for i in range(1, 30):
+    div_id = f'parts{i:02d}'
+    div = soup.find('div', {'class': 'parts_box', 'id': div_id})
 
-with open('kanji_list.json', 'w') as json_file:
-  json.dump(data, json_file, ensure_ascii=False, indent=2) 
+    if div:
+      ul = div.find('ul', {'class': 'search_parts'})
+      lis = ul.find_all('li')
+      for li in lis:
+        a = li.find('a')
+        character = a.text
+        link = a['href']
+        linkpath = link[len(DOMAIN)+1:] if link.startswith(DOMAIN) else link
+        kanji_list.append({
+            'character': character,
+            'stroke': i,
+            'linkpath': linkpath
+        })
+
+  with open(output_path, 'w', encoding='utf-8') as json_file:
+    json.dump({
+        'domain': DOMAIN,
+        'kanji': kanji_list
+    }, json_file, ensure_ascii=False, indent=2)
+
+
+def main():
+  parser = argparse.ArgumentParser(description='漢字データをスクレイピングしてJSONファイルを生成します')
+  parser.add_argument('--outdir', default='', help='出力するJSONファイルのパィレクトリパス')
+  args = parser.parse_args()
+
+  outdir = args.outdir or ""
+  output_path = os.path.join(outdir, 'kanji.json')
+  os.makedirs(outdir, exist_ok=True)
+
+  scrape_kanji(output_path)
+
+
+if __name__ == '__main__':
+  main()

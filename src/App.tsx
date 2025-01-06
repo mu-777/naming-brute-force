@@ -1,62 +1,57 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import Box from '@mui/joy/Box';
 import Header from './components/Header';
 import SearchForm from './components/SearchForm';
 import Results from './components/Results';
-import Stack from '@mui/joy/Stack';
 import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
 import Tab from '@mui/joy/Tab';
-import Typography from '@mui/joy/Typography';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import SearchIcon from '@mui/icons-material/Search';
-import ResultCard from './components/ResultCard';
-import { Result, GroupedResults } from '@/types/Result';
-import { useFavorites } from '@/hooks/useFavorites';
+import { GroupedResults } from '@/types/Result';
+import Favorites from '@/components/Favorites';
+import { useAtom } from 'jotai';
+import { searchParamsAtom } from '@/store/atoms';
+import { useResults } from '@/store/atoms';
 
-
+enum TabType {
+  SEARCH = 'SEARCH',
+  FAVORITES = 'FAVORITES'
+}
 
 function App() {
-  const [kanjiInput, setKanjiInput] = useState("");
-  const [searchMode, setSearchMode] = useState("OR");
-  const [charCount, setCharCount] = useState("");
-  const [strokeCount, setStrokeCount] = useState("");
-  const [results, setResults] = useState<GroupedResults>({});
-  const [activeTab, setActiveTab] = useState("search");
+  const [searchParams, setSearchParams] = useAtom(searchParamsAtom);
+  const { updateResults } = useResults();
+  const [activeTab, setActiveTab] = useState(TabType.SEARCH);
+  const workerRef = useRef<Worker | null>(null);
 
-  const handleSearch = () => {
-    const dummyResults: Result[] = [
-      { name: "優翔", totalStrokes: 20 },
-      { name: "翔太", totalStrokes: 15 },
-      { name: "翔太", totalStrokes: 15 },
-      { name: "翔太", totalStrokes: 16 },
-      { name: "翔太", totalStrokes: 16 },
-      { name: "翔太", totalStrokes: 15 },
-      { name: "翔太", totalStrokes: 15 },
-      { name: "翔太", totalStrokes: 15 },
-      { name: "優花", totalStrokes: 18 },
-    ];
-    const groupedResults = dummyResults.reduce<GroupedResults>((acc, result) => {
-      if (!acc[result.totalStrokes]) {
-        acc[result.totalStrokes] = [];
-      }
-      acc[result.totalStrokes].push(result);
-      return acc;
-    }, {});
-    setResults(groupedResults);
-  };
+  const handleSearch = useCallback(() => {
+    if (workerRef.current) {
+      workerRef.current.terminate();
+    }
 
-  const handleRemove = (strokeGroup: number, index: number) => {
-    setResults((prevResults) => {
-      const updatedResults = { ...prevResults };
-      updatedResults[strokeGroup] = updatedResults[strokeGroup].filter((_, i) => i !== index);
-      if (updatedResults[strokeGroup].length === 0) {
-        delete updatedResults[strokeGroup];
+    workerRef.current = new Worker(
+      new URL('./functions/nameGenerator.worker.ts', import.meta.url),
+      { type: 'module' }
+    );
+
+    workerRef.current.onmessage = (e: MessageEvent<{ type: string; results: GroupedResults }>) => {
+      if (e.data.type === 'partial') {
+        updateResults(e.data.results);
       }
-      return updatedResults;
-    });
-  };
+    };
+
+    workerRef.current.postMessage(searchParams);
+  }, [searchParams, updateResults]);
+
+  useEffect(() => {
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
+    };
+  }, []);
 
   return (
     <Box
@@ -74,14 +69,8 @@ function App() {
       >
         <Header />
         <SearchForm
-          kanjiInput={kanjiInput}
-          setKanjiInput={setKanjiInput}
-          searchMode={searchMode}
-          setSearchMode={setSearchMode}
-          charCount={charCount}
-          setCharCount={setCharCount}
-          strokeCount={strokeCount}
-          setStrokeCount={setStrokeCount}
+          searchParams={searchParams}
+          setSearchParams={setSearchParams}
           onSearch={handleSearch}
         />
       </Box>
@@ -96,7 +85,7 @@ function App() {
       >
         <Tabs
           value={activeTab}
-          onChange={(_, value) => setActiveTab(typeof value === 'string' ? value : 'search')}
+          onChange={(_, value) => setActiveTab(value as TabType)}
           sx={{
             mb: 2,
             position: 'sticky',
@@ -106,13 +95,13 @@ function App() {
           }}
         >
           <TabList>
-            <Tab value="search">
+            <Tab value={TabType.SEARCH}>
               <ListItemDecorator>
                 <SearchIcon />
               </ListItemDecorator>
               検索結果
             </Tab>
-            <Tab value="favorites">
+            <Tab value={TabType.FAVORITES}>
               <ListItemDecorator>
                 <FavoriteBorderIcon />
               </ListItemDecorator>
@@ -120,31 +109,10 @@ function App() {
             </Tab>
           </TabList>
         </Tabs>
-
-        {activeTab === 'search' ? (
-          <Results
-            results={results}
-            onRemove={handleRemove}
-          />
+        {activeTab === TabType.SEARCH ? (
+          <Results />
         ) : (
-          <Box>
-            {favorites.length === 0 ? (
-              <Typography level="body-lg" textAlign="center">
-                まだお気に入りに追加された名前はありません
-              </Typography>
-            ) : (
-              <Stack spacing={2}>
-                {favorites.map((favorite, index) => (
-                  <ResultCard
-                    key={index}
-                    strokeGroup={0}
-                    result={favorite}
-                    onRemove={() => removeFavorite(favorite.name)}
-                  />
-                ))}
-              </Stack>
-            )}
-          </Box>
+          <Favorites />
         )}
       </Box>
     </Box>

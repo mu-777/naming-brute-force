@@ -1,13 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Result, GroupedResults } from '@/types/Result';
+import { useAtom } from 'jotai';
+import { favoritesAtom } from '@/store/atoms';
+import { Result } from '@/types/Result';
+import { useCallback, useEffect } from 'react';
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<GroupedResults>(() => {
-    const saved = localStorage.getItem('favorites');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [favorites, setFavorites] = useAtom(favoritesAtom);
 
-  const addFavorite = (result: Result) => {
+  // 初期化時にローカルストレージから読み込み
+  useEffect(() => {
+    const saved = localStorage.getItem('favorites');
+    if (saved) {
+      setFavorites(JSON.parse(saved));
+    }
+  }, []);
+
+  const addFavorite = useCallback((result: Result) => {
     setFavorites(prev => {
       const totalStroke = result.totalStrokes;
       return {
@@ -15,9 +22,9 @@ export function useFavorites() {
         [totalStroke]: [...(prev[totalStroke] || []), result]
       };
     });
-  };
+  }, []);
 
-  const removeFavorite = (name: string) => {
+  const removeFavorite = useCallback((name: string) => {
     setFavorites(prev => {
       const newFavorites = { ...prev };
       Object.keys(newFavorites).forEach((strokeCount) => {
@@ -30,11 +37,16 @@ export function useFavorites() {
       });
       return newFavorites;
     });
-  };
+  }, []);
 
+  const isFavorite = useCallback((name: string): boolean => {
+    return Object.values(favorites).flat().some(favorite => favorite.name === name);
+  }, [favorites]);
+
+  // お気に入りが更新されたらローカルストレージに保存
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
-  return { favorites, addFavorite, removeFavorite };
+  return { favorites, addFavorite, removeFavorite, isFavorite };
 }
