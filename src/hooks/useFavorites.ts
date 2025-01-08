@@ -10,9 +10,15 @@ export function useFavorites() {
   useEffect(() => {
     const saved = localStorage.getItem('favorites');
     if (saved) {
-      setFavorites(JSON.parse(saved));
+      try {
+        const parsedFavorites = JSON.parse(saved);
+        setFavorites(parsedFavorites);
+      } catch (error) {
+        console.error('お気に入りの読み込みに失敗しました:', error);
+        localStorage.removeItem('favorites');
+      }
     }
-  }, []);
+  }, [setFavorites]);
 
   const addFavorite = useCallback((result: Result) => {
     setFavorites(prev => {

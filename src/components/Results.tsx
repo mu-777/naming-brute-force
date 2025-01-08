@@ -40,12 +40,33 @@ function Results() {
     return () => observer.disconnect();
   }, [displayedCount, results.length]);
 
+  useEffect(() => {
+    console.log('useEffect');
+    const handleScroll = () => {
+      console.log('handleScroll');
+      if (parentRef.current) {
+        console.log(parentRef.current.scrollTop);
+      }
+    };
+
+    const parentElement = parentRef.current;
+    parentElement?.addEventListener('scroll', handleScroll);
+
+    return () => {
+      parentElement?.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   if (results.length === 0) {
     return <Typography>条件を入力して検索してください。</Typography>;
   }
 
   return (
-    <Box ref={parentRef} sx={{ height: '100%', overflow: 'auto' }}>
+    <Box
+      ref={parentRef}
+      sx={{
+        height: '100%', overflow: 'auto', margin: '0px', padding: '0px'
+      }}>
       <div
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,

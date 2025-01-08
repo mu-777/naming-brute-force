@@ -10,7 +10,11 @@ export const searchParamsAtom = atom<SearchParams>({
   strokeCount: 10
 });
 
-export const favoritesAtom = atom<Result[]>([]);
+// ローカルストレージから初期値を読み込む
+const savedFavorites = localStorage.getItem('favorites');
+const initialFavorites = savedFavorites ? JSON.parse(savedFavorites) : {};
+
+export const favoritesAtom = atom<Record<number, Result[]>>(initialFavorites);
 
 export const useResults = () => {
   const [results, setResults] = useAtom(resultsAtom);

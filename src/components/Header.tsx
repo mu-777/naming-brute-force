@@ -6,9 +6,9 @@ function Header() {
     <Box>
       <Box textAlign="center">
         <Typography level="h1" mb={1}>
-          人名漢字 全組み合わせマン
+          人名漢字 全組合せくん
         </Typography>
-        <Typography level="body-lg" color="neutral">
+        <Typography level="body-md" color="neutral">
           善し悪し・存在するしないに関わらず、指定の条件での全ての人名漢字の組み合わせを表示します。
         </Typography>
       </Box>

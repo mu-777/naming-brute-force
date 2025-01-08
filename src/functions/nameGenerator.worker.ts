@@ -1,4 +1,4 @@
-import { Result, GroupedResults, SearchParams, KanjiData } from '@/types/Result';
+import { Result, SearchParams, KanjiData } from '@/types/Result';
 
 
 type KanjiJson = {
@@ -30,7 +30,7 @@ self.onmessage = async (e: MessageEvent<SearchParams>) => {
           const name = cachedInputedKanji?.character + chars[i].character + chars[j].character;
           const totalStrokes = cachedInputedKanji?.stroke + chars[i].stroke + chars[j].stroke;
 
-          if (strokeCount && totalStrokes !== strokeCount) continue;
+          // if (strokeCount && totalStrokes !== strokeCount) continue;
 
           yield { name, totalStrokes };
         }

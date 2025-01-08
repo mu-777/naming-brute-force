@@ -20,7 +20,7 @@ export type SearchParams = {
   kanjiInput: string[];
   searchMode: SearchMode;
   charCount: CharCount;
-  strokeCount: number;
+  strokeCounts: number[] | null;
 };
 
 
@@ -28,4 +28,8 @@ export type KanjiData = {
   character: string;
   stroke: number;
   linkpath: string;
+};
+
+export type ExcludedKanji = {
+  character: string;
 };
