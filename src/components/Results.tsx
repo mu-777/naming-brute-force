@@ -49,7 +49,7 @@ function Results() {
     };
 
     const parentElement = parentRef.current;
-    parentElement?.addEventListener('scroll', handleScroll);
+    parentElement?.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       parentElement?.removeEventListener('scroll', handleScroll);

@@ -68,7 +68,7 @@ function App() {
         display: 'flex',
         flexDirection: 'column',
         height: 'max(100vh, 100%)',
-        background: 'linear-gradient(180deg, var(--joy-palette-background-level1) 50%, var(--joy-palette-background-body) 100%)',
+        background: 'linear-gradient(180deg, var(--joy-palette-background-level1) 75%, var(--joy-palette-background-body) 100%)',
       }}
     >
       <Box
