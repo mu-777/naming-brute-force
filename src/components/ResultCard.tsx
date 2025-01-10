@@ -24,33 +24,24 @@ function ResultCardBase({
     <Card
       variant="outlined"
       sx={{
-        p: 3,
+        p: 2,
         mb: 2,
         position: 'relative',
         transition: 'all 0.3s ease',
         borderRadius: '16px',
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
         backdropFilter: 'blur(8px)',
-        // '&:hover': {
-        //   transform: 'translateY(-4px)',
-        //   backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        //   boxShadow: 'var(--joy-shadowRing, 0 0 #000), 0 4px 20px -2px var(--joy-shadowChannel, rgba(0 0 0 / 0.2))'
-        // }
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          boxShadow: 'var(--joy-shadowRing, 0 0 #000), 0 4px 20px -2px var(--joy-shadowChannel, rgba(0 0 0 / 0.2))'
+        }
       }}
     >
-      <Stack spacing={2}>
-        <Typography
-          level="h2"
+      <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+        <Stack direction="row" spacing={1}
           sx={{
-            fontSize: '3rem',
-            textAlign: 'center',
-            mb: 2
-          }}
-        >
-          {result.name}
-        </Typography>
-
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          }}>
           <Button
             variant="soft"
             color="neutral"
@@ -58,38 +49,57 @@ function ResultCardBase({
             size="sm"
             onClick={() => isFavorite ? onRemoveFavorite(result.name) : onAddFavorite(result)}
           >
-            {isFavorite ? "お気に入りから削除" : "お気に入りに追加"}
+            {isFavorite ? "削除" : "追加"}
           </Button>
-          {
-            !onRemove ? null : <Button
-              variant="soft"
-              color="danger"
-              onClick={() => console.log('remove')}
-              size="sm"
-            >
-              削除
-            </Button>
-          }
+        </Stack>
+
+        <Stack direction="column" alignItems="center" sx={{ flex: '0 1 auto' }}>
+          <Typography
+            level="h2"
+            sx={{
+              fontSize: '3rem',
+              textAlign: 'center',
+              m: 0
+            }}
+          >
+            {result.name}
+          </Typography>
+          <Typography
+            level="body-sm"
+            sx={{
+              color: 'text.tertiary',
+              mt: 0.5
+            }}
+          >
+            (総画数: {result.totalStrokes})
+          </Typography>
         </Stack>
 
         <Stack
-          direction="row"
-          spacing={2}
-          mt={1}
-          justifyContent="center"
+          direction="column"
+          spacing={1}
+          sx={{
+            flex: '0',
+            minWidth: '80px'
+          }}
         >
           {[...result.name].map((char, i) => (
             <Card
               key={i}
               variant="soft"
               sx={{
-                p: 2,
+                p: 1,
                 textAlign: 'center',
-                minWidth: '80px'
               }}
             >
-              <Typography level="h4">{char}</Typography>
-              <Typography level="body-sm">画数: xxx</Typography>
+              <Stack direction="row" alignItems="center" justifyContent="space-between">
+                <Typography level="body-sm">
+                  {char}
+                </Typography>
+                <Typography level="body-xs" sx={{ color: 'text.secondary' }}>
+                  (x画)
+                </Typography>
+              </Stack>
             </Card>
           ))}
         </Stack>
