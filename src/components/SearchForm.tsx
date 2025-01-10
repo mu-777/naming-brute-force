@@ -35,7 +35,7 @@ function SearchForm({ searchParams, setSearchParams, onSearch }: SearchFormProps
             sx={{
               fontSize: '1.2rem',
               '--Input-focusedThickness': '2px',
-              flex: 2
+              flex: 2,
             }}
           />
           <Select

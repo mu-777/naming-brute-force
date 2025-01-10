@@ -57,27 +57,10 @@ function App() {
     };
   }, []);
 
-  const scrollPositions = useRef<Record<TabType, number>>({
-    [TabType.SEARCH]: 0,
-    [TabType.FAVORITES]: 0,
-    [TabType.SETTINGS]: 0,
-  });
-
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const handleTabChange = (value: TabType) => {
-    console.log(containerRef.current?.scrollTop);
-    if (containerRef.current) {
-      scrollPositions.current[activeTab] = containerRef.current.scrollTop;
-    }
     setActiveTab(value);
   };
 
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTo(0, scrollPositions.current[activeTab]);
-    }
-  }, [activeTab]);
 
   return (
     <Box
@@ -163,7 +146,6 @@ function App() {
         </Box>
 
         <Box
-        ref={containerRef}
           sx={{
             flex: 1,
             overflow: 'auto',

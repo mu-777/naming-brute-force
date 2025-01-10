@@ -41,7 +41,6 @@ function Results() {
   }, [displayedCount, results.length]);
 
   useEffect(() => {
-    console.log('useEffect');
     const handleScroll = () => {
       console.log('handleScroll');
       if (parentRef.current) {
