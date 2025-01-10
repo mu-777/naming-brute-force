@@ -84,6 +84,8 @@ function App() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
+        height: 'max(100vh, 100%)',
+        background: 'linear-gradient(180deg, var(--joy-palette-background-level1) 50%, var(--joy-palette-background-body) 100%)',
       }}
     >
       <Box
@@ -91,12 +93,13 @@ function App() {
           maxWidth: '1200px',
           width: 'calc(100% - 32px)',
           margin: '0px auto',
-          '@media (min-width: 600px)': {
-            width: 'calc(100% - 64px)'
-          }
+          // padding: '24px',
+          // '@media (min-width: 600px)': {
+          //   width: 'calc(100% - 64px)',
+          //   padding: '18px'
+          // }
         }}
       >
-        <Box sx={{ height: '5px' }} />
         <Header />
 
         <Box
@@ -104,12 +107,12 @@ function App() {
             flexShrink: 0,
             position: 'sticky',
             top: 0,
-            backgroundColor: 'white',
-            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: 'var(--joy-shadowRing, 0 0 #000), 0 2px 8px -2px var(--joy-shadowChannel, rgba(0 0 0 / 0.08))',
             zIndex: 10
           }}
         >
-          <Box sx={{ height: '10px' }} />
           <SearchForm
             searchParams={searchParams}
             setSearchParams={setSearchParams}
@@ -123,7 +126,7 @@ function App() {
               mb: 2,
               position: 'sticky',
               top: 0,
-              backgroundColor: 'white',
+              backgroundColor: 'var(--joy-palette-background-surface)',
               zIndex: 1,
               margin: '20px auto'
             }}

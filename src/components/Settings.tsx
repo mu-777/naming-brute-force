@@ -24,12 +24,17 @@ const KanjiCheckbox = memo(({
       border: '1px solid',
       borderColor: 'divider',
       borderRadius: 'sm',
+      background: 'var(--joy-palette-background-surface)',
     }}
   >
     <Checkbox
       label={kanji.character}
       checked={isExcluded}
       onChange={onToggle}
+      size='lg'
+      sx={{
+        
+      }}
     />
   </Box>
 ), (prevProps, nextProps) =>

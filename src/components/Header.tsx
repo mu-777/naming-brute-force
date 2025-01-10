@@ -3,7 +3,10 @@ import Box from '@mui/joy/Box';
 
 function Header() {
   return (
-    <Box>
+    <Box sx={{
+      padding: '16px'
+      // backgroundColor: 'var(--joy-palette-header-bg)'
+       }}>
       <Box textAlign="center">
         <Typography level="h1" mb={1}>
           人名漢字 全組合せくん

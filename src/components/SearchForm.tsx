@@ -22,7 +22,7 @@ function SearchForm({ searchParams, setSearchParams, onSearch }: SearchFormProps
 
   return (
     <Box>
-      <Stack direction="column" spacing={2.5}>
+      <Stack direction="column" spacing={2.5} sx={{padding: '16px'}}>
         <Stack direction="row" spacing={1} sx={{ flex: 1, alignItems: 'center' }}>
           <Input
             size="md"
@@ -35,7 +35,7 @@ function SearchForm({ searchParams, setSearchParams, onSearch }: SearchFormProps
             sx={{
               fontSize: '1.2rem',
               '--Input-focusedThickness': '2px',
-              flex: 1
+              flex: 2
             }}
           />
           <Select
@@ -96,6 +96,7 @@ function SearchForm({ searchParams, setSearchParams, onSearch }: SearchFormProps
           <Stack direction="row" spacing={2} alignItems="center">
             <Checkbox
               size="md"
+              sx={{ flex: 1 }}
               label={useStrokeCount ? '' : '指定する'}
               checked={useStrokeCount}
               onChange={(e) => {
@@ -103,11 +104,12 @@ function SearchForm({ searchParams, setSearchParams, onSearch }: SearchFormProps
               }}
             />
             {useStrokeCount && (
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+              <Stack direction="row" spacing={1} sx={{flex: 1, alignItems: 'center' }}>
                 <Input
                   type="text"
-                  size="md"
+                  size="sm"                  
                   placeholder="例: 1,3-5,8"
+                  sx={{ width: '100%' }}
                   // value={searchParams.strokeCounts?.join(',') || ''}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -155,6 +157,10 @@ function SearchForm({ searchParams, setSearchParams, onSearch }: SearchFormProps
           sx={{
             width: 'auto',
             mx: 'auto',
+            background: 'var(--joy-palette-gradient-main)',
+            '&:hover': {
+              // background: 'var(--joy-palette-gradient-heavy)',
+            }
           }}
         >
           検索

@@ -27,11 +27,15 @@ function ResultCardBase({
         p: 3,
         mb: 2,
         position: 'relative',
-        transition: 'transform 0.2s',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-        }
+        transition: 'all 0.3s ease',
+        borderRadius: '16px',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(8px)',
+        // '&:hover': {
+        //   transform: 'translateY(-4px)',
+        //   backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        //   boxShadow: 'var(--joy-shadowRing, 0 0 #000), 0 4px 20px -2px var(--joy-shadowChannel, rgba(0 0 0 / 0.2))'
+        // }
       }}
     >
       <Stack spacing={2}>
