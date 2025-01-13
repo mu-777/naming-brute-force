@@ -1,8 +1,20 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ExcludedKanji } from '@/types/KanjiTypes';
 
 export function useExcludedKanji() {
-  const defaultExcludedKanji: ExcludedKanji[] = [];
+  const defaultExcludedKanji: ExcludedKanji[] = [
+    { "character": "鬱" },
+    { "character": "亡" },
+    { "character": "凶" },
+    { "character": "弔" },
+    { "character": "犯" },
+    { "character": "死" },
+    { "character": "汚" },
+    { "character": "災" },
+    { "character": "忌" },
+    { "character": "怨" },
+    { "character": "醜" }
+  ];
   const [excludedKanji, setExcludedKanji] = useState<ExcludedKanji[]>(() => {
     const saved = localStorage.getItem('excludedKanji');
     if (saved) {
@@ -22,11 +34,13 @@ export function useExcludedKanji() {
       const newValue = isExcluded
         ? prev.filter(k => k.character !== character)
         : [...prev, { character }];
-      
+
       localStorage.setItem('excludedKanji', JSON.stringify(newValue));
       return newValue;
     });
   }, []);
+
+  console.log(excludedKanji)
 
   return {
     excludedKanji,

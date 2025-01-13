@@ -3,6 +3,8 @@ export type Result = {
   totalStrokes: number;
 };
 
+export type StrokeGroupedResult = Record<number, Result[]>;
+
 export enum SearchMode {
   START_WITH = 'START_WITH',
   END_WITH = 'END_WITH',

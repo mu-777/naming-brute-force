@@ -1,10 +1,9 @@
-import { useEffect, useState, useMemo, memo, useCallback } from 'react';
+import { useMemo, memo, useCallback } from 'react';
 import Box from '@mui/joy/Box';
 import Typography from '@mui/joy/Typography';
 import Checkbox from '@mui/joy/Checkbox';
 import { useExcludedKanji } from '@/hooks/useExcludedKanji';
 import { useKanjiData } from '@/store/atoms';
-import { KanjiCache } from '@/types/KanjiTypes';
 
 const MAX_STROKE = 30;
 

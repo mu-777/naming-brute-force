@@ -1,6 +1,6 @@
 import { atom, useAtom } from 'jotai';
-import { Result, SearchParams, SearchMode, KanjiCache, KanjiInfo, KanjiDict, StrokeGroupedKanji } from '@/types/KanjiTypes';
-import { useState, useEffect } from 'react';
+import { Result,StrokeGroupedResult, SearchParams, SearchMode, KanjiCache, } from '@/types/KanjiTypes';
+import { useEffect } from 'react';
 
 export const resultsAtom = atom<Result[]>([]);
 
@@ -15,7 +15,7 @@ export const searchParamsAtom = atom<SearchParams>({
 const savedFavorites = localStorage.getItem('favorites');
 const initialFavorites = savedFavorites ? JSON.parse(savedFavorites) : {};
 
-export const favoritesAtom = atom<Record<number, Result[]>>(initialFavorites);
+export const favoritesAtom = atom<StrokeGroupedResult>(initialFavorites as StrokeGroupedResult);
 
 export const useResults = () => {
   const [results, setResults] = useAtom(resultsAtom);

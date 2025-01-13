@@ -3,6 +3,26 @@ import { createRoot } from 'react-dom/client'
 import { CssVarsProvider, extendTheme } from '@mui/joy/styles';
 import App from './App.tsx'
 
+// https://mui.com/joy-ui/customization/theme-colors/#adding-new-palettes
+import type { PaletteRange } from '@mui/joy/styles';
+declare module '@mui/joy/styles' {
+  interface ColorPalettePropOverrides {
+    // apply to all Joy UI components that support `color` prop
+    secondary: true;
+  }
+
+  interface Palette {
+    // this will make the node `secondary` configurable in `extendTheme`
+    // and add `secondary` to the theme's palette.
+    secondary: PaletteRange;
+    gradient:{
+      main: string,
+      heavy: string,
+      light: string,
+    }
+  }
+}
+
 const theme = extendTheme({
   colorSchemes: {
     light: {
@@ -105,10 +125,7 @@ const theme = extendTheme({
       styleOverrides: {
         root: {
           borderRadius: '12px',
-          fontSize: {
-            xs: 'var(--joy-fontSize-sm)',
-            sm: 'var(--joy-fontSize-md)',
-          },
+          fontSize: 'var(--joy-fontSize-md)'
         },
       },
     },

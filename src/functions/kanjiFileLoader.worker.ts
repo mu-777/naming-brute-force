@@ -21,7 +21,7 @@ self.onmessage = async () => {
     });
 
     self.postMessage({ kanjiDict, strokeGroupedKanji });
-  } catch (error) {
+  } catch (error: any) {
     self.postMessage({ error: error.message });
   }
 };
