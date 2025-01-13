@@ -39,9 +39,6 @@ export function useExcludedKanji() {
       return newValue;
     });
   }, []);
-
-  console.log(excludedKanji)
-
   return {
     excludedKanji,
     toggleExcludedKanji
