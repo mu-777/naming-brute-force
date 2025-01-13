@@ -11,12 +11,11 @@ import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SearchIcon from '@mui/icons-material/Search';
-import { GroupedResults } from '@/types/Result';
+import { Result } from '@/types/KanjiTypes';
 import Favorites from '@/components/Favorites';
 import Settings from '@/components/Settings';
 import { useAtom } from 'jotai';
-import { searchParamsAtom } from '@/store/atoms';
-import { useResults } from '@/store/atoms';
+import { searchParamsAtom, useKanjiData, useResults } from '@/store/atoms';
 
 enum TabType {
   SEARCH = 'SEARCH',
@@ -26,7 +25,8 @@ enum TabType {
 
 function App() {
   const [searchParams, setSearchParams] = useAtom(searchParamsAtom);
-  const { updateResults } = useResults();
+  const kanjiCache = useKanjiData();
+  const { results, setResults, updateResults } = useResults();
   const [activeTab, setActiveTab] = useState(TabType.SEARCH);
   const workerRef = useRef<Worker | null>(null);
 
@@ -34,19 +34,22 @@ function App() {
     if (workerRef.current) {
       workerRef.current.terminate();
     }
+    if (results.length > 0) {
+      setResults([]);
+    }
 
     workerRef.current = new Worker(
       new URL('./functions/nameGenerator.worker.ts', import.meta.url),
       { type: 'module' }
     );
 
-    workerRef.current.onmessage = (e: MessageEvent<{ type: string; results: GroupedResults }>) => {
+    workerRef.current.onmessage = (e: MessageEvent<{ type: string; results: Result[] }>) => {
       if (e.data.type === 'partial') {
         updateResults(e.data.results);
       }
     };
 
-    workerRef.current.postMessage(searchParams);
+    workerRef.current.postMessage({ searchParams: searchParams, kanjiCache: kanjiCache });
   }, [searchParams, updateResults]);
 
   useEffect(() => {

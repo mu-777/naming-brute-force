@@ -1,5 +1,6 @@
 import { atom, useAtom } from 'jotai';
-import { Result, SearchParams, SearchMode } from '@/types/Result';
+import { Result, SearchParams, SearchMode, KanjiCache, KanjiInfo } from '@/types/KanjiTypes';
+import { useEffect } from 'react';
 
 export const resultsAtom = atom<Result[]>([]);
 
@@ -28,4 +29,49 @@ export const useResults = () => {
   };
 
   return { results, setResults, updateResults, removeResult };
+};
+
+type KanjiData = {
+  character: string;
+  stroke: number;
+  linkpath: string;
+};
+
+export const kanjiCacheAtom = atom<KanjiCache>({
+  kanjiDict: {},
+  strokeGroupedKanji: {}
+});
+
+export const useKanjiData = () => {
+  const [kanjiCache, setKanjiCache] = useAtom(kanjiCacheAtom);
+
+  useEffect(() => {
+    if (Object.keys(kanjiCache.kanjiDict).length > 0) return;
+
+    fetch('/kanji.json')
+      .then(res => res.json())
+      .then(data => {
+        const kanjiDict: Record<string, KanjiInfo> = {};
+        const strokeGroupedKanji: Record<number, string[]> = {};
+        
+        data.kanji.forEach((kanji: KanjiData) => {
+          kanjiDict[kanji.character] = {
+            stroke: kanji.stroke,
+            linkpath: kanji.linkpath
+          };
+          
+          if (!strokeGroupedKanji[kanji.stroke]) {
+            strokeGroupedKanji[kanji.stroke] = [];
+          }
+          strokeGroupedKanji[kanji.stroke].push(kanji.character);
+        });
+
+        setKanjiCache({
+          kanjiDict,
+          strokeGroupedKanji
+        });
+      });
+  }, []);
+
+  return kanjiCache;
 };

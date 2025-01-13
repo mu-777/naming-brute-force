@@ -7,7 +7,7 @@ import ResultCard from './ResultCard';
 import Typography from '@mui/joy/Typography';
 import Box from '@mui/joy/Box';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 30;
 
 function Results() {
   const results = useAtomValue(resultsAtom);
@@ -19,8 +19,8 @@ function Results() {
   const rowVirtualizer = useVirtualizer({
     count: Math.min(displayedCount, results.length),
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 150,
-    overscan: 5,
+    estimateSize: () => results.length === 0 ? 150 : results[0].name.length === 2 ? 150 : 175,
+    overscan: Math.floor(ITEMS_PER_PAGE / 2),
   });
 
   useEffect(() => {

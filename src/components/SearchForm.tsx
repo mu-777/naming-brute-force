@@ -9,7 +9,7 @@ import Option from '@mui/joy/Option';
 import Typography from '@mui/joy/Typography';
 import Box from '@mui/joy/Box';
 import Checkbox from '@mui/joy/Checkbox';
-import { SearchMode, CharCount, SearchParams } from '@/types/Result';
+import { SearchMode, CharCount, SearchParams } from '@/types/KanjiTypes';
 
 type SearchFormProps = {
   searchParams: SearchParams;
@@ -101,6 +101,9 @@ function SearchForm({ searchParams, setSearchParams, onSearch }: SearchFormProps
               checked={useStrokeCount}
               onChange={(e) => {
                 setUseStrokeCount(e.target.checked);
+                if (!e.target.checked) {
+                  setSearchParams(prev => ({ ...prev, strokeCounts: [] }));
+                }
               }}
             />
             {useStrokeCount && (

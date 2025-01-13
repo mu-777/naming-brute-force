@@ -32,7 +32,7 @@ function ResultCardBase({
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
         backdropFilter: 'blur(8px)',
         '&:hover': {
-          transform: 'translateY(-4px)',
+          transform: 'translateY(0px)',
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           boxShadow: 'var(--joy-shadowRing, 0 0 #000), 0 4px 20px -2px var(--joy-shadowChannel, rgba(0 0 0 / 0.2))'
         }

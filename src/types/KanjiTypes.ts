@@ -3,8 +3,6 @@ export type Result = {
   totalStrokes: number;
 };
 
-export type GroupedResults = Record<number, Result[]>;
-
 export enum SearchMode {
   START_WITH = 'START_WITH',
   END_WITH = 'END_WITH',
@@ -20,16 +18,18 @@ export type SearchParams = {
   kanjiInput: string[];
   searchMode: SearchMode;
   charCount: CharCount;
-  strokeCounts: number[] | null;
+  strokeCounts: number[];
 };
 
-
-export type KanjiData = {
-  character: string;
+export type KanjiInfo = {
   stroke: number;
   linkpath: string;
 };
 
-export type ExcludedKanji = {
-  character: string;
+export type KanjiDict = Record<string, KanjiInfo>;
+export type StrokeGroupedKanji = Record<number, string[]>;
+
+export type KanjiCache = {
+  kanjiDict: KanjiDict;
+  strokeGroupedKanji: StrokeGroupedKanji;
 };

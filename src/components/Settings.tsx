@@ -3,7 +3,10 @@ import Box from '@mui/joy/Box';
 import Typography from '@mui/joy/Typography';
 import Checkbox from '@mui/joy/Checkbox';
 import { useExcludedKanji } from '@/hooks/useExcludedKanji';
-import { KanjiData } from '@/types/Result';
+import { useKanjiData } from '@/store/atoms';
+
+
+const MAX_STROKE = 30;
 
 // チェックボックスコンポーネントをメモ化
 const KanjiCheckbox = memo(({
@@ -11,7 +14,7 @@ const KanjiCheckbox = memo(({
   isExcluded,
   onToggle
 }: {
-  kanji: KanjiData;
+  kanji: string;
   isExcluded: boolean;
   onToggle: () => void;
 }) => (
@@ -28,7 +31,7 @@ const KanjiCheckbox = memo(({
     }}
   >
     <Checkbox
-      label={kanji.character}
+      label={kanji}
       checked={isExcluded}
       onChange={onToggle}
       size='lg'
@@ -41,31 +44,8 @@ const KanjiCheckbox = memo(({
   prevProps.isExcluded === nextProps.isExcluded
 );
 
-type GroupedKanji = Record<number, KanjiData[]>
-
-// グローバルな状態として保持
-const useKanjiData = () => {
-  const [groupedKanji, setGroupedKanji] = useState<GroupedKanji>({});
-  const [maxStroke, setMaxStroke] = useState<number>(0);
-
-  useEffect(() => {
-    fetch('/kanji.json')
-      .then(res => res.json())
-      .then(data => {
-        const groups = data.kanji.reduce((acc: GroupedKanji, kanji: KanjiData) => {
-          (acc[kanji.stroke] = acc[kanji.stroke] || []).push(kanji);
-          return acc;
-        }, {});
-        setGroupedKanji(groups);
-        setMaxStroke(Math.max(...Object.keys(groups).map(Number)));
-      });
-  }, []);
-
-  return { groupedKanji, maxStroke };
-};
-
 function Settings() {
-  const { groupedKanji, maxStroke } = useKanjiData();
+  const kanjiCache = useKanjiData();
   const { excludedKanji, toggleExcludedKanji } = useExcludedKanji();
 
   // 除外漢字のSetを作成（高速な検索のため）
@@ -86,8 +66,8 @@ function Settings() {
         チェックを入れた漢字は名前の組み合わせに使用されません
       </Typography>
       {
-        Array.from({ length: maxStroke }, (_, i) => i + 1).map(stroke => (
-          groupedKanji[stroke] && (
+        Array.from({ length: MAX_STROKE }, (_, i) => i + 1).map(stroke => (
+          kanjiCache.strokeGroupedKanji[stroke] && (
             <Box key={stroke} mb={4}>
               <Typography level="title-lg" mb={2} sx={{
                 borderBottom: '2px solid',
@@ -104,12 +84,12 @@ function Settings() {
                   gap: 2,
                 }}
               >
-                {groupedKanji[stroke].map((kanji) => (
+                {kanjiCache.strokeGroupedKanji[stroke].map((kanji, index) => (
                   <KanjiCheckbox
-                    key={kanji.character}
+                    key={`${stroke}-${index}`}
                     kanji={kanji}
-                    isExcluded={excludedKanjiSet.has(kanji.character)}
-                    onToggle={() => handleToggle(kanji.character)}
+                    isExcluded={excludedKanjiSet.has(kanji)}
+                    onToggle={() => handleToggle(kanji)}
                   />
                 ))}
               </Box>
