@@ -7,7 +7,7 @@ import path from 'path'
 export default defineConfig({
   base: process.env.GITHUB_PAGES
     ? "naming-brute-force"
-    : "./",
+    : "/",
   plugins: [react(), tsconfigPaths()],
   resolve: {
     alias: {
