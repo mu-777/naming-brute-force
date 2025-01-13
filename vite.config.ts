@@ -5,6 +5,9 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.GITHUB_PAGES
+    ? "naming-brute-force"
+    : "./",
   plugins: [react(), tsconfigPaths()],
   resolve: {
     alias: {

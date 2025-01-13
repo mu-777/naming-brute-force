@@ -100,7 +100,7 @@ function ResultCardBase({
                   {char}
                 </Typography>
                 <Typography level="body-xs" sx={{ color: 'text.secondary' }}>
-                  {`(${kanjiCache.kanjiDict[char].stroke}画)`}
+                  {`(${kanjiCache.kanjiDict[char]?.stroke || "xx"}画)`}
                 </Typography>
               </Stack>
             </Card>
