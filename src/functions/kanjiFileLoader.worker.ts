@@ -2,7 +2,7 @@ import { KanjiInfo } from '@/types/KanjiTypes';
 
 self.onmessage = async () => {
   try {
-    const response = await fetch(import.meta.env.BASE_URL + 'kanji.json');
+    const response = await fetch((process?.env.GITHUB_PAGES ? "naming-brute-force" : "") + '/kanji.json');
     const kanjiData = await response.json();
     
     const kanjiDict: Record<string, KanjiInfo> = {};
