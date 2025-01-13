@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { favoritesAtom } from '@/store/atoms';
-import { Result } from '@/types/Result';
+import { Result, StrokeGroupedResult } from '@/types/KanjiTypes';
 import { useCallback, useEffect } from 'react';
 
 export function useFavorites() {
@@ -11,7 +11,7 @@ export function useFavorites() {
     const saved = localStorage.getItem('favorites');
     if (saved) {
       try {
-        const parsedFavorites = JSON.parse(saved);
+        const parsedFavorites = JSON.parse(saved) as StrokeGroupedResult;
         setFavorites(parsedFavorites);
       } catch (error) {
         console.error('お気に入りの読み込みに失敗しました:', error);

@@ -15,7 +15,7 @@ function Header() {
         <Typography level="h1" mb={1}>
           人名漢字∞組み合わせ
         </Typography>
-        <Typography level="body-md" color="neutral" sx={{ alignItems: 'center' }}>
+        <Typography level="body-md" sx={{ alignItems: 'center' }}>
           善し悪し・存在するしないに関わらず、指定の条件での全ての人名漢字の組み合わせを表示します。
         </Typography>
         {/* <Stack direction="row" spacing={1} justifyContent="center">

@@ -6,7 +6,8 @@ import Card from '@mui/joy/Card';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Result } from '@/types/Result';
+import { Result } from '@/types/KanjiTypes';
+import { useKanjiData } from '@/store/atoms';
 
 type ResultCardProps = {
   result: Result;
@@ -17,8 +18,10 @@ type ResultCardProps = {
 };
 
 function ResultCardBase({
-  result, onRemove, onAddFavorite, onRemoveFavorite, isFavorite
+  result, onAddFavorite, onRemoveFavorite, isFavorite
 }: ResultCardProps) {
+
+  const kanjiCache = useKanjiData();
 
   return (
     <Card
@@ -44,7 +47,7 @@ function ResultCardBase({
           }}>
           <Button
             variant="soft"
-            color="neutral"
+            color="secondary"
             startDecorator={isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
             size="sm"
             onClick={() => isFavorite ? onRemoveFavorite(result.name) : onAddFavorite(result)}
@@ -97,7 +100,7 @@ function ResultCardBase({
                   {char}
                 </Typography>
                 <Typography level="body-xs" sx={{ color: 'text.secondary' }}>
-                  (x画)
+                  {`(${kanjiCache.kanjiDict[char].stroke}画)`}
                 </Typography>
               </Stack>
             </Card>

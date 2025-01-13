@@ -21,7 +21,6 @@ function Favorites({ }: FavoritesProps) {
           {favorites[parseInt(strokeGroup)].map((result, index) => (
             <ResultCard
               key={index}
-              strokeGroup={parseInt(strokeGroup)}
               result={result}
               onAddFavorite={addFavorite}
               onRemoveFavorite={removeFavorite}
