@@ -1,6 +1,6 @@
 import { atom, useAtom } from 'jotai';
-import { Result, SearchParams, SearchMode, KanjiCache, KanjiInfo } from '@/types/KanjiTypes';
-import { useEffect } from 'react';
+import { Result, SearchParams, SearchMode, KanjiCache, KanjiInfo, KanjiDict, StrokeGroupedKanji } from '@/types/KanjiTypes';
+import { useState, useEffect } from 'react';
 
 export const resultsAtom = atom<Result[]>([]);
 
@@ -8,7 +8,7 @@ export const searchParamsAtom = atom<SearchParams>({
   kanjiInput: [],
   searchMode: SearchMode.CONTAIN,
   charCount: 2,
-  strokeCount: 10
+  strokeCounts: []
 });
 
 // ローカルストレージから初期値を読み込む
@@ -31,47 +31,68 @@ export const useResults = () => {
   return { results, setResults, updateResults, removeResult };
 };
 
-type KanjiData = {
-  character: string;
-  stroke: number;
-  linkpath: string;
-};
-
 export const kanjiCacheAtom = atom<KanjiCache>({
   kanjiDict: {},
-  strokeGroupedKanji: {}
+  strokeGroupedKanji: {},
+  isLoading: false
+});
+
+// Workerのステータスを管理するアトム
+const workerStatusAtom = atom<{
+  isInitialized: boolean;
+  worker: Worker | null;
+}>({
+  isInitialized: false,
+  worker: null
 });
 
 export const useKanjiData = () => {
   const [kanjiCache, setKanjiCache] = useAtom(kanjiCacheAtom);
+  const [workerStatus, setWorkerStatus] = useAtom(workerStatusAtom);
 
   useEffect(() => {
-    if (Object.keys(kanjiCache.kanjiDict).length > 0) return;
+    const loadKanjiData = async () => {
+      if (Object.keys(kanjiCache.kanjiDict).length > 0 || workerStatus.isInitialized) {
+        return;
+      }
 
-    fetch('/kanji.json')
-      .then(res => res.json())
-      .then(data => {
-        const kanjiDict: Record<string, KanjiInfo> = {};
-        const strokeGroupedKanji: Record<number, string[]> = {};
-        
-        data.kanji.forEach((kanji: KanjiData) => {
-          kanjiDict[kanji.character] = {
-            stroke: kanji.stroke,
-            linkpath: kanji.linkpath
-          };
-          
-          if (!strokeGroupedKanji[kanji.stroke]) {
-            strokeGroupedKanji[kanji.stroke] = [];
-          }
-          strokeGroupedKanji[kanji.stroke].push(kanji.character);
-        });
+      setKanjiCache(prev => ({ ...prev, isLoading: true }));
 
-        setKanjiCache({
-          kanjiDict,
-          strokeGroupedKanji
-        });
+      const worker = new Worker(
+        new URL('../functions/kanjiFileLoader.worker.ts', import.meta.url),
+        { type: 'module' }
+      );
+
+      setWorkerStatus({
+        isInitialized: true,
+        worker
       });
-  }, []);
+
+      worker.onmessage = (event) => {
+        if (event.data.error) {
+          console.error('漢字データの読み込みエラー:', event.data.error);
+          setKanjiCache(prev => ({ ...prev, isLoading: false }));
+        } else {
+          setKanjiCache({
+            kanjiDict: event.data.kanjiDict,
+            strokeGroupedKanji: event.data.strokeGroupedKanji,
+            isLoading: false
+          });
+        }
+      };
+
+      worker.postMessage(null);
+
+      return () => {
+        if (worker) {
+          worker.terminate();
+          setWorkerStatus(prev => ({ ...prev, worker: null }));
+        }
+      };
+    };
+
+    loadKanjiData();
+  }, [kanjiCache, workerStatus, setKanjiCache, setWorkerStatus]);
 
   return kanjiCache;
 };

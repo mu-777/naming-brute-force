@@ -32,4 +32,9 @@ export type StrokeGroupedKanji = Record<number, string[]>;
 export type KanjiCache = {
   kanjiDict: KanjiDict;
   strokeGroupedKanji: StrokeGroupedKanji;
+  isLoading: boolean;
+};
+
+export type ExcludedKanji = {
+  character: string;
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { ExcludedKanji } from '@/types/Result';
+import { ExcludedKanji } from '@/types/KanjiTypes';
 
 export function useExcludedKanji() {
   const defaultExcludedKanji: ExcludedKanji[] = [];

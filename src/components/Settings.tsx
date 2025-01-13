@@ -4,7 +4,7 @@ import Typography from '@mui/joy/Typography';
 import Checkbox from '@mui/joy/Checkbox';
 import { useExcludedKanji } from '@/hooks/useExcludedKanji';
 import { useKanjiData } from '@/store/atoms';
-
+import { KanjiCache } from '@/types/KanjiTypes';
 
 const MAX_STROKE = 30;
 
@@ -36,7 +36,7 @@ const KanjiCheckbox = memo(({
       onChange={onToggle}
       size='lg'
       sx={{
-        
+
       }}
     />
   </Box>
@@ -65,8 +65,12 @@ function Settings() {
       <Typography level="body-md" mb={4}>
         チェックを入れた漢字は名前の組み合わせに使用されません
       </Typography>
-      {
-        Array.from({ length: MAX_STROKE }, (_, i) => i + 1).map(stroke => (
+      {kanjiCache.isLoading ? (
+        <Typography level="body-md" textAlign="center">
+          漢字データを読み込み中...
+        </Typography>
+      ) : (
+        kanjiCache && Array.from({ length: MAX_STROKE }, (_, i) => i + 1).map(stroke => (
           kanjiCache.strokeGroupedKanji[stroke] && (
             <Box key={stroke} mb={4}>
               <Typography level="title-lg" mb={2} sx={{
@@ -95,7 +99,8 @@ function Settings() {
               </Box>
             </Box>
           )
-        ))}
+        ))
+      )}
     </Box>
   );
 }

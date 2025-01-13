@@ -16,6 +16,7 @@ import Favorites from '@/components/Favorites';
 import Settings from '@/components/Settings';
 import { useAtom } from 'jotai';
 import { searchParamsAtom, useKanjiData, useResults } from '@/store/atoms';
+import { useExcludedKanji } from '@/hooks/useExcludedKanji';
 
 enum TabType {
   SEARCH = 'SEARCH',
@@ -25,12 +26,14 @@ enum TabType {
 
 function App() {
   const [searchParams, setSearchParams] = useAtom(searchParamsAtom);
-  const kanjiCache = useKanjiData();
+  const { excludedKanji } = useExcludedKanji();
   const { results, setResults, updateResults } = useResults();
   const [activeTab, setActiveTab] = useState(TabType.SEARCH);
   const workerRef = useRef<Worker | null>(null);
 
-  const handleSearch = useCallback(() => {
+  const kanjiCache = useKanjiData();
+
+  const handleSearch = useCallback(async () => {
     if (workerRef.current) {
       workerRef.current.terminate();
     }
@@ -49,8 +52,12 @@ function App() {
       }
     };
 
-    workerRef.current.postMessage({ searchParams: searchParams, kanjiCache: kanjiCache });
-  }, [searchParams, updateResults]);
+    workerRef.current.postMessage({
+      searchParams: searchParams,
+      kanjiCache: kanjiCache,
+      excludedKanji: excludedKanji
+    });
+  }, [searchParams, updateResults, kanjiCache, excludedKanji]);
 
   useEffect(() => {
     return () => {
@@ -100,9 +107,11 @@ function App() {
           }}
         >
           <SearchForm
+            kanjiCache={kanjiCache}
             searchParams={searchParams}
             setSearchParams={setSearchParams}
             onSearch={handleSearch}
+            isKanjiLoading={kanjiCache.isLoading}
           />
 
           <Tabs
