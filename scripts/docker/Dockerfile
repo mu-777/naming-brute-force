@@ -1,7 +1,7 @@
 FROM python:3.7
 
 RUN apt update && apt install -y --no-install-recommends \
-    sudo gosu less build-essential git vim iputils-ping net-tools dnsutils wget \
+    sudo gosu \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install requests beautifulsoup4

@@ -1,6 +1,6 @@
 import json
 
-with open('kanji_list.json', 'r') as json_file:
+with open('../public/kanji_list.json', 'r') as json_file:
   data = json.load(json_file)
 
 cnt = 0

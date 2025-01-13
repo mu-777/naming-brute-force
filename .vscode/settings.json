@@ -1,3 +1,4 @@
 {
-  "livePreview.defaultPreviewPath": "/combination_test.html"
+  "livePreview.defaultPreviewPath": "/combination_test.html",
+  "editor.defaultColorDecorators": true
 }
