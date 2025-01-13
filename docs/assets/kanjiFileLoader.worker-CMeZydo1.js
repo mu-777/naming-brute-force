@@ -1,0 +1,1 @@
+(function(){"use strict";self.onmessage=async()=>{try{const r=await(await fetch("./kanji.json")).json(),o={},e={};r.kanji.forEach(s=>{o[s.character]={stroke:s.stroke,linkpath:s.linkpath},e[s.stroke]||(e[s.stroke]=[]),e[s.stroke].push(s.character)}),self.postMessage({kanjiDict:o,strokeGroupedKanji:e})}catch(t){self.postMessage({error:t.message})}}})();
