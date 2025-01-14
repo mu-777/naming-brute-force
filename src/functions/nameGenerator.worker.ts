@@ -44,7 +44,7 @@ self.onmessage = async (e: MessageEvent<{
         }
       }
     } else {
-      const candidateKanjiList: string[] = Object.keys(kanjiDict);
+      const candidateKanjiList: string[] = Object.keys(kanjiDict).filter(kanji => !excludedKanjiSet.has(kanji));
       for (const kanji1 of candidateKanjiList) {
         for (const kanji2 of candidateKanjiList) {
           const totalStrokes = inputedKanjiStroke + kanjiDict[kanji1].stroke + kanjiDict[kanji2].stroke;
