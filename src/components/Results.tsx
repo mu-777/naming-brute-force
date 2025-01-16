@@ -17,17 +17,18 @@ function Results() {
   const loadingRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
-    count: Math.min(displayedCount, results.length),
+    count: Math.min(displayedCount, results?.length || 0),
     getScrollElement: () => parentRef.current,
-    estimateSize: () => results.length === 0 ? 150 : results[0].name.length === 2 ? 150 : 175,
+    estimateSize: () => (results === null || results.length === 0) ? 150 : results[0].name.length === 2 ? 150 : 175,
     overscan: Math.floor(ITEMS_PER_PAGE / 2),
   });
 
   useEffect(() => {
+    const resultLength = (results?.length || 0);
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && displayedCount < results.length) {
-          setDisplayedCount(prev => Math.min(prev + ITEMS_PER_PAGE, results.length));
+        if (entries[0].isIntersecting && displayedCount < resultLength) {
+          setDisplayedCount(prev => Math.min(prev + ITEMS_PER_PAGE, resultLength));
         }
       },
       { threshold: 0.1 }
@@ -38,7 +39,7 @@ function Results() {
     }
 
     return () => observer.disconnect();
-  }, [displayedCount, results.length]);
+  }, [displayedCount, results?.length]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,8 +57,10 @@ function Results() {
     };
   }, []);
 
-  if (results.length === 0) {
+  if (results === null) {
     return <Typography>条件を入力して検索してください。</Typography>;
+  } else if (results.length === 0) {
+    return <Typography>条件に合致する組み合わせはありませんでした。</Typography>;
   }
 
   return (

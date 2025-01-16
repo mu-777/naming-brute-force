@@ -2,7 +2,6 @@ import { KanjiInfo } from '@/types/KanjiTypes';
 
 self.onmessage = async () => {
   try {
-    console.log(`${import.meta.env.BASE_URL}kanji.json`)
     const response = await fetch(`${import.meta.env.BASE_URL}kanji.json`);
     const kanjiData = await response.json();
     

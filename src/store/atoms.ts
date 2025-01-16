@@ -1,8 +1,9 @@
 import { atom, useAtom } from 'jotai';
-import { Result,StrokeGroupedResult, SearchParams, SearchMode, KanjiCache, } from '@/types/KanjiTypes';
+import { Result, StrokeGroupedResult, SearchParams, SearchMode, KanjiCache, } from '@/types/KanjiTypes';
 import { useEffect } from 'react';
 
-export const resultsAtom = atom<Result[]>([]);
+// null→検索されてない状態、[]→検索した結果がゼロ
+export const resultsAtom = atom<Result[] | null>(null);
 
 export const searchParamsAtom = atom<SearchParams>({
   kanjiInput: [],
@@ -21,11 +22,11 @@ export const useResults = () => {
   const [results, setResults] = useAtom(resultsAtom);
 
   const updateResults = (newResults: Result[]) => {
-    setResults(prev => [...prev, ...newResults]);
+    setResults(prev => prev ? [...prev, ...newResults] : newResults);
   };
 
   const removeResult = (index: number) => {
-    setResults(prev => prev.filter((_, i) => i !== index));
+    setResults(prev => prev ? prev.filter((_, i) => i !== index) : prev);
   };
 
   return { results, setResults, updateResults, removeResult };
