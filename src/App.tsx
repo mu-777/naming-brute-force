@@ -17,12 +17,16 @@ import Settings from '@/components/Settings';
 import { useAtom } from 'jotai';
 import { searchParamsAtom, useKanjiData, useResults } from '@/store/atoms';
 import { useExcludedKanji } from '@/hooks/useExcludedKanji';
+import Footer from '@/components/Footer';
 
 enum TabType {
   SEARCH = 'SEARCH',
   FAVORITES = 'FAVORITES',
   SETTINGS = 'SETTINGS'
 }
+
+const footerPaddingPx = 3;
+const footerHeightPx = 32;
 
 function App() {
   const [searchParams, setSearchParams] = useAtom(searchParamsAtom);
@@ -79,7 +83,7 @@ function App() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'max(100vh, 100%)',
+        height: '100%',
         background: 'var(--joy-palette-gradient-background)',
       }}
     >
@@ -88,6 +92,7 @@ function App() {
           maxWidth: '1200px',
           width: 'calc(100% - 32px)',
           margin: '0px auto',
+          minHeight: `calc(100vh - ${footerHeightPx + 2 * footerPaddingPx}px)`,
           // padding: '24px',
           // '@media (min-width: 600px)': {
           //   width: 'calc(100% - 64px)',
@@ -177,6 +182,7 @@ function App() {
           </Box>
         </Box>
       </Box>
+      <Footer footerHeightPx={footerHeightPx} footerPaddingPx={footerPaddingPx} />
     </Box>
   );
 }

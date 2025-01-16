@@ -15,7 +15,7 @@ declare module '@mui/joy/styles' {
     // this will make the node `secondary` configurable in `extendTheme`
     // and add `secondary` to the theme's palette.
     secondary: PaletteRange;
-    gradient:{
+    gradient: {
       main: string,
       heavy: string,
       light: string,
@@ -85,6 +85,10 @@ const theme = extendTheme({
     },
     h2: {
       fontSize: 'var(--joy-fontSize-xl2)',
+      fontWeight: 'var(--joy-fontWeight-md)',
+    },
+    h3: {
+      fontSize: 'var(--joy-fontSize-xl)',
       fontWeight: 'var(--joy-fontWeight-md)',
     },
     'title-lg': {
