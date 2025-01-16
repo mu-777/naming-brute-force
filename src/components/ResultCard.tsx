@@ -47,7 +47,7 @@ function ResultCardBase({
           }}>
           <Button
             variant="soft"
-            color="secondary"
+            color="neutral"
             startDecorator={isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
             size="sm"
             onClick={() => isFavorite ? onRemoveFavorite(result.name) : onAddFavorite(result)}

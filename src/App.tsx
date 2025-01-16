@@ -37,8 +37,8 @@ function App() {
     if (workerRef.current) {
       workerRef.current.terminate();
     }
-    if (results.length > 0) {
-      setResults([]);
+    if (results && results.length > 0) {
+      setResults(null);
     }
 
     workerRef.current = new Worker(
@@ -57,6 +57,8 @@ function App() {
       kanjiCache: kanjiCache,
       excludedKanji: excludedKanji
     });
+
+    setActiveTab(TabType.SEARCH);
   }, [searchParams, updateResults, kanjiCache, excludedKanji]);
 
   useEffect(() => {
@@ -78,7 +80,7 @@ function App() {
         display: 'flex',
         flexDirection: 'column',
         height: 'max(100vh, 100%)',
-        background: 'linear-gradient(180deg, var(--joy-palette-background-level1) 75%, var(--joy-palette-background-body) 100%)',
+        background: 'var(--joy-palette-gradient-background)',
       }}
     >
       <Box

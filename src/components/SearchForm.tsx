@@ -37,7 +37,6 @@ function SearchForm({ kanjiCache, searchParams, setSearchParams, onSearch, isKan
   }, [kanjiCache])
 
   const updateKanjiInputAndCharCount = (newInput: string, charCount: CharCount) => {
-    console.log("updateKanjiInput", newInput)
     setKanjiInputError(null)
     if (newInput.length > 0 && newInput.split('').every((s) => !kanjiCandidates.includes(s))) {
       setKanjiInputError(`人名漢字に含まれない文字があります: ${newInput.split('').filter((s) => !kanjiCandidates.includes(s)).join(', ')}`)
@@ -140,87 +139,89 @@ function SearchForm({ kanjiCache, searchParams, setSearchParams, onSearch, isKan
           </RadioGroup>
         </Stack>
 
-        <Stack direction="row" spacing={4} sx={{ flex: 1, alignItems: 'center' }}>
-          <Typography level="title-lg">総画数</Typography>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Checkbox
-              size="md"
-              sx={{ flex: 1 }}
-              label={useStrokeCount ? '' : '指定する'}
-              checked={useStrokeCount}
-              onChange={(e) => {
-                setUseStrokeCount(e.target.checked);
-                if (!e.target.checked) {
-                  setSearchParams(prev => ({ ...prev, strokeCounts: [] }));
-                }
-              }}
-            />
-            {useStrokeCount && (
-              <Stack direction="row" spacing={1} sx={{ flex: 1, alignItems: 'center' }}>
-                <FormControl error={!!strokeInputError} sx={{ width: '100%' }}>
-                  <Input
-                    type="text"
-                    size="sm"
-                    placeholder="例: 1,3-5,8"
-                    sx={{ width: '100%' }}
-                    // value={searchParams.strokeCounts?.join(',') || ''}
-                    onChange={(e) => {
-                      setStrokeInputError(null)
-                      const value = e.target.value;
-                      const parts = value.split(SEPARATOR_REGEX) // 区切り文字で分割
-                        .map(p => p.trim()) // 前後の空白を削除
-                        .filter(p => p.length > 0); // 空文字列を除外
+        <Stack direction="row" spacing={4} sx={{ flex: 1, alignItems: 'center', overflow: 'hidden' }}>
+          <Typography level="title-lg" sx={{ flexShrink: 0, whiteSpace: 'nowrap' }}>総画数</Typography>
+          <Checkbox
+            size="md"
+            // sx={{ width: '100%' }}
+            label={useStrokeCount ? '' : '指定する'}
+            checked={useStrokeCount}
+            onChange={(e) => {
+              setUseStrokeCount(e.target.checked);
+              if (!e.target.checked) {
+                setSearchParams(prev => ({ ...prev, strokeCounts: [] }));
+              }
+            }}
+          />
+          {useStrokeCount && (
+            <Stack direction="row" spacing={1} sx={{ flex: 1, alignItems: 'center', minWidth: 0 }}>
+              <FormControl error={!!strokeInputError} sx={{
+                flex: 1,
+                overflow: 'hidden',
+                maxWidth: '250px'
+              }}>
+                <Input
+                  type="text"
+                  size="sm"
+                  placeholder="例: 1,3-5,8"
+                  sx={{ flex: 1, minWidth: 0 }}
+                  // value={searchParams.strokeCounts?.join(',') || ''}
+                  onChange={(e) => {
+                    setStrokeInputError(null)
+                    const value = e.target.value;
+                    const parts = value.split(SEPARATOR_REGEX) // 区切り文字で分割
+                      .map(p => p.trim()) // 前後の空白を削除
+                      .filter(p => p.length > 0); // 空文字列を除外
 
-                      const strokeCounts = parts.flatMap(part => {
-                        const rangeDelimiters = ['-', '~', '〜', '－'];
-                        const range = part.split(new RegExp(rangeDelimiters.map(s => s.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')));
+                    const strokeCounts = parts.flatMap(part => {
+                      const rangeDelimiters = ['-', '~', '〜', '－'];
+                      const range = part.split(new RegExp(rangeDelimiters.map(s => s.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')));
 
-                        if (range.length === 2) { // 範囲指定の処理
-                          const num1 = parseInt(range[0].trim(), 10);
-                          const num2 = parseInt(range[1].trim(), 10);
-                          if (isNaN(num1) || isNaN(num2)) {
-                            setStrokeInputError("数字以外の文字が入っています")
-                            return [];
-                          }
-                          if ((num1 <= 0) || (num2 <= 0)) {
-                            setStrokeInputError("0より大きい数字を入れてください")
-                            return [];
-                          }
-                          const start = Math.min(num1, num2);
-                          const end = Math.max(num1, num2);
-                          return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-                        } else if (range.length === 1) {
-                          const num = parseInt(range[0], 10);
-                          if (isNaN(num)) {
-                            setStrokeInputError("数字以外の文字が入っています")
-                            return [];
-                          }
-                          if (num <= 0) {
-                            setStrokeInputError("0より大きい数字を入れてください")
-                            return [];
-                          }
-                          return !isNaN(num) && num > 0 ? [num] : [];
+                      if (range.length === 2) { // 範囲指定の処理
+                        const num1 = parseInt(range[0].trim(), 10);
+                        const num2 = parseInt(range[1].trim(), 10);
+                        if (isNaN(num1) || isNaN(num2)) {
+                          setStrokeInputError("数字以外の文字が入っています")
+                          return [];
                         }
-                        return [];
-                      });
-                      // 重複を削除して昇順にソート
-                      setSearchParams(prev => ({
-                        ...prev,
-                        strokeCounts: strokeCounts.length > 0 ? [...new Set(strokeCounts)].sort((a, b) => a - b) : [],
-                      }));
-                      console.log('Final strokeCounts:', [...new Set(strokeCounts)].sort((a, b) => a - b));
-                    }}
-                  />
-                  {strokeInputError && (
-                    <FormHelperText>
-                      <InfoOutlined /> {strokeInputError}
-                    </FormHelperText>
-                  )}
-                </FormControl>
+                        if ((num1 <= 0) || (num2 <= 0)) {
+                          setStrokeInputError("0より大きい数字を入れてください")
+                          return [];
+                        }
+                        const start = Math.min(num1, num2);
+                        const end = Math.max(num1, num2);
+                        return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+                      } else if (range.length === 1) {
+                        const num = parseInt(range[0], 10);
+                        if (isNaN(num)) {
+                          setStrokeInputError("数字以外の文字が入っています")
+                          return [];
+                        }
+                        if (num <= 0) {
+                          setStrokeInputError("0より大きい数字を入れてください")
+                          return [];
+                        }
+                        return !isNaN(num) && num > 0 ? [num] : [];
+                      }
+                      return [];
+                    });
+                    // 重複を削除して昇順にソート
+                    setSearchParams(prev => ({
+                      ...prev,
+                      strokeCounts: strokeCounts.length > 0 ? [...new Set(strokeCounts)].sort((a, b) => a - b) : [],
+                    }));
+                    // console.log('Final strokeCounts:', [...new Set(strokeCounts)].sort((a, b) => a - b));
+                  }}
+                />
+                {strokeInputError && (
+                  <FormHelperText>
+                    <InfoOutlined /> {strokeInputError}
+                  </FormHelperText>
+                )}
+              </FormControl>
 
-              </Stack>
-            )}
-          </Stack>
+            </Stack>
+          )}
         </Stack>
         <Button
           variant="solid"

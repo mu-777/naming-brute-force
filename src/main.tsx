@@ -19,6 +19,7 @@ declare module '@mui/joy/styles' {
       main: string,
       heavy: string,
       light: string,
+      background: string,
     }
   }
 }
@@ -52,7 +53,7 @@ const theme = extendTheme({
           900: '#713f12',
         },
         background: {
-          body: '#FFFFFF',
+          body: 'var(--joy-palette-background-level1)',
           surface: '#FFFFFF',
         },
         text: {
@@ -63,6 +64,7 @@ const theme = extendTheme({
           main: 'linear-gradient(60deg, var(--joy-palette-primary-500) 0%, var(--joy-palette-primary-300) 40%, var(--joy-palette-secondary-300) 60%, var(--joy-palette-secondary-500) 100%)',
           heavy: 'linear-gradient(60deg, var(--joy-palette-primary-800) 0%, var(--joy-palette-primary-500) 40%, var(--joy-palette-secondary-500) 60%, var(--joy-palette-secondary-800) 100%)',
           light: 'linear-gradient(60deg, var(--joy-palette-primary-400) 0%, var(--joy-palette-primary-200) 40%, var(--joy-palette-secondary-200) 60%, var(--joy-palette-secondary-400) 100%)',
+          background: 'linear-gradient(180deg, var(--joy-palette-background-level1) 75%, #FFFFFF 100%)',
         },
       },
     },
@@ -86,7 +88,7 @@ const theme = extendTheme({
       fontWeight: 'var(--joy-fontWeight-md)',
     },
     'title-lg': {
-      fontSize: 'var(--joy-fontSize-xl)',
+      fontSize: 'var(--joy-fontSize-lg)',
       fontWeight: 'var(--joy-fontWeight-md)',
     },
     'body-md': {
