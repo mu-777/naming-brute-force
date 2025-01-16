@@ -82,10 +82,7 @@ self.onmessage = async (e: MessageEvent<{
 
   let batch: Result[] = [];
   for (const result of generator) {
-    console.log(result)
-
     batch.push(result);
-
     if (batch.length >= BATCH_SIZE) {
       self.postMessage({ type: 'partial', results: batch });
       batch = [];
