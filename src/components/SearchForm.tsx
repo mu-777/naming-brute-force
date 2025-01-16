@@ -67,7 +67,7 @@ function SearchForm({ kanjiCache, searchParams, setSearchParams, onSearch, isKan
 
   return (
     <Box>
-      <Stack direction="column" spacing={2.5} sx={{ padding: '16px' }}>
+      <Stack direction="column" spacing={2} sx={{ padding: '16px' }}>
         <FormControl error={!!kanjiInputError}>
           <Input
             size="md"
