@@ -12,6 +12,65 @@ type DisclaimerModalProps = {
 };
 
 function DisclaimerModal({ open, onClose }: DisclaimerModalProps) {
+  // const renderTextWithLinks = (text: string) => {
+  //   const linkRegex = /(https?:\/\/[^\s]+)/g;
+  //   const parts = text.split(linkRegex);
+
+  //   return parts.map((part, index) => {
+  //     if (linkRegex.test(part)) {
+  //       // リンク部分を `<a>` タグにする
+  //       return (
+  //         <a
+  //           key={index}
+  //           href={part}
+  //           target="_blank"
+  //           rel="noopener noreferrer"
+  //           style={{ color: 'blue', textDecoration: 'underline' }}
+  //         >
+  //           {part}
+  //         </a>
+  //       );
+  //     }
+  //     return part; // 通常のテキスト部分
+  //   });
+  // };
+
+  const renderMarkdownLinks = (text: string) => {
+    // マークダウン記法のリンクを検出する正規表現
+    const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+
+    const parts = [];
+    let lastIndex = 0;
+
+    // マッチ部分を解析
+    text.replace(markdownLinkRegex, (match, linkText, href, offset) => {
+      // マッチ前の通常の文字列部分を追加
+      if (offset > lastIndex) {
+        parts.push(text.substring(lastIndex, offset));
+      }
+      // マッチしたリンク部分を `<a>` タグに変換
+      parts.push(
+        <a
+          key={offset}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'blue', textDecoration: 'underline' }}
+        >
+          {linkText}
+        </a>
+      );
+      lastIndex = offset + match.length;
+      return match;
+    });
+
+    // 最後の部分を追加
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    return parts;
+  };
   const contents = [
     [
       '掲載内容について',
@@ -44,6 +103,14 @@ function DisclaimerModal({ open, onClose }: DisclaimerModalProps) {
       '提供サービス内容の変更',
       '本サイトが提供するサービスは、利用者に通知することなく内容変更、提供中止をすることができるものとし、\
       これによって利用者に生じた損害について一切の責任を負いません。'
+    ],
+    [
+      'プライバシーポリシー',
+      '当サイトでは、Googleによるアクセス解析ツール「Googleアナリティクス」を使用しています。\
+      このGoogleアナリティクスはデータの収集のためにCookieを使用しています。このデータは匿名で収集されており、個人を特定するものではありません。\
+      この機能はCookieを無効にすることで収集を拒否することが出来ますので、お使いのブラウザの設定をご確認ください。\
+      この規約に関しての詳細は[Googleアナリティクスサービス利用規約](https://marketingplatform.google.com/about/analytics/terms/jp/)や\
+      [Googleポリシーと規約](https://policies.google.com/technologies/ads?hl=ja)をご覧ください。'
     ],
     [
       '引用・リンクについて',
@@ -83,7 +150,7 @@ function DisclaimerModal({ open, onClose }: DisclaimerModalProps) {
             return (
               <div>
                 <Typography level="h3" mb={1}>{`・${e[0]}`}</Typography>
-                <Typography mb={3} sx={{ wordBreak: 'break-all' }}>{e[1]}</Typography>
+                <Typography mb={3} sx={{ wordBreak: 'break-all' }}>{renderMarkdownLinks(e[1])}</Typography>
               </div>
             );
           })}
